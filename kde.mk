@@ -7,7 +7,6 @@ DEB_DH_INSTALL_ARGS = --sourcedir=debian/tmp
 DEB_COMPRESS_EXCLUDE = .dcl .docbook -license .tag .sty .el
 
 
-DEB_CMAKE_EXTRA_FLAGS = $(DEB_CMAKE_EXTRA_FLAGS) -D
 
 ifeq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	#no optimizations, full debug
