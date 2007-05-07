@@ -1,3 +1,7 @@
+export XDG_DATA_DIRS=/usr/share
+export XDG_CONFIG_DIRS=/etc/xdg
+
+
 include debian/cdbs/cmake.mk
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/rules/patchsys-quilt.mk
