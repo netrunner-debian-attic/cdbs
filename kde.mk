@@ -5,7 +5,7 @@ export XDG_CONFIG_DIRS=/etc/xdg
 include debian/cdbs/cmake.mk
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/rules/patchsys-quilt.mk
-include /usr/share/cdbs/1/rules/utils.mk
+include debian/cdbs/utils.mk
 
 DEB_DH_INSTALL_ARGS = --sourcedir=debian/tmp
 DEB_COMPRESS_EXCLUDE = .dcl .docbook -license .tag .sty .el
