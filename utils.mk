@@ -29,10 +29,10 @@ include $(_cdbs_rules_path)/buildcore.mk$(_cdbs_makefile_suffix)
 DEB_PHONY_RULES += list-missing
 
 list-missing:
-	if test -d debian/tmp; then \
+	@if test -d debian/tmp; then \
 	  (cd debian/tmp && find . -type f -o -type l | grep -v '/DEBIAN/' | sort) > debian/cdbs-install-list; \
 	  (for package in $(DEB_ALL_PACKAGES); do \
-	     (cd debian/$$package && find . -type f -o -type l ); \
+	     (cd debian/$$package && find . -type f -o -type l); \
 	   done) | sort -u > debian/cdbs-package-list; \
 	   if test -e debian/not-installed ;\
 	     then grep -v '^#' debian/not-installed >> debian/cdbs-package-list ; \
