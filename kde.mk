@@ -9,7 +9,7 @@ include /usr/share/cdbs/1/rules/utils.mk
 
 DEB_DH_INSTALL_ARGS = --sourcedir=debian/tmp
 DEB_COMPRESS_EXCLUDE = .dcl .docbook -license .tag .sty .el
-DEB_KDE_ENABLE_FINAL ?= yes
+DEB_KDE_ENABLE_FINAL ?= 
 
 DEB_CMAKE_EXTRA_FLAGS += -DKDE4_BUILD_TESTS=true -DKDE_DISTRIBUTION_TEXT="Debian packages"
 
