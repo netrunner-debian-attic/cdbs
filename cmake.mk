@@ -49,10 +49,11 @@ common-configure-arch common-configure-indep:: common-configure-impl
 common-configure-impl:: $(DEB_BUILDDIR)/CMakeCache.txt
 $(DEB_BUILDDIR)/CMakeCache.txt:
 	cd $(DEB_BUILDDIR) && cmake $(CURDIR)/$(DEB_SRCDIR) \
-	-DCMAKE_INSTALL_PREFIX="$(DEB_CMAKE_PREFIX)" \
+	-DCMAKE_INSTALL_PREFIX="$(DEB_CMAKE_PREFIX)" $(KDE4-ENABLE-FINAL) \
 	$(DEB_CMAKE_EXTRA_FLAGS) -DCMAKE_CXX_FLAGS="$(CXXFLAGS)" \
 	-DCMAKE_C_FLAGS="$(CFLAGS)" -DCMAKE_VERBOSE_MAKEFILE=ON $(DEB_CMAKE_DEBUG_FLAGS) \
-	-DCMAKE_SKIP_RPATH=true
+	-DCMAKE_SKIP_RPATH=true -DKDE4_BUILD_TESTS=true -DKDE_DISTRIBUTION_TEXT="Debian packages" \
+	-DLIBRARY_OUTPUT_PATH=/usr/lib -DSYSCONF_INSTALL_DIR=/etc
 	mkdir -p $(DEB_DESTDIR)
 
 cleanbuilddir::
