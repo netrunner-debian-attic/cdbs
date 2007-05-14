@@ -58,6 +58,7 @@ $(DEB_BUILDDIR)/CMakeCache.txt:
 
 cleanbuilddir::
 	-if test "$(DEB_BUILDDIR)" != "$(DEB_SRCDIR)"; then rm -rf $(DEB_BUILDDIR); fi
+	rm -f CMakeCache.txt
 
 endif
 
