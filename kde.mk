@@ -35,3 +35,32 @@ endif
 
 
 
+common-build-arch:: debian/stamp-man-pages
+debian/stamp-man-pages:
+	if ! test -d debian/man/out; then mkdir -p debian/man/out; fi
+	for f in $$(find debian/man -name '*.sgml'); do \
+		docbook-to-man $$f > debian/man/out/`basename $$f .sgml`.1; \
+	done
+	for f in $$(find debian/man -name '*.man'); do \
+		soelim -I debian/man $$f \
+		> debian/man/out/`basename $$f .man`.`head -n1 $$f | awk '{print $$NF}'`; \
+	done
+	touch debian/stamp-man-pages
+
+clean::
+	rm -rf debian/man/out
+	-rmdir debian/man
+	rm -f debian/stamp-man-pages
+
+binary-install/$(DEB_SOURCE_PACKAGE)-doc-html::
+	set -e; \
+	for doc in `cd $(DEB_DESTDIR)/usr/share/doc/kde/HTML/en; find . -name index.docbook`; do \
+		pkg=$${doc%/index.docbook}; pkg=$${pkg#./}; \
+		echo Building $$pkg HTML docs...; \
+		mkdir -p $(CURDIR)/debian/$(DEB_SOURCE_PACKAGE)-doc-html/usr/share/doc/kde/HTML/en/$$pkg; \
+		cd $(CURDIR)/debian/$(DEB_SOURCE_PACKAGE)-doc-html/usr/share/doc/kde/HTML/en/$$pkg; \
+		meinproc $(DEB_DESTDIR)/usr/share/doc/kde/HTML/en/$$pkg/index.docbook; \
+	done
+	for pkg in $(DOC_HTML_PRUNE) ; do \
+		rm -rf debian/$(DEB_SOURCE_PACKAGE)-doc-html/usr/share/doc/kde/HTML/en/$$pkg; \
+	done
