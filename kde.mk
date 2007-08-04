@@ -1,7 +1,6 @@
 export XDG_DATA_DIRS=/usr/share
 export XDG_CONFIG_DIRS=/etc/xdg
 
-
 include debian/cdbs/cmake.mk
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/rules/patchsys-quilt.mk
@@ -9,7 +8,7 @@ include debian/cdbs/utils.mk
 
 DEB_DH_INSTALL_ARGS = --sourcedir=debian/tmp
 DEB_COMPRESS_EXCLUDE = .dcl .docbook -license .tag .sty .el
-DEB_KDE_ENABLE_FINAL ?= 
+DEB_KDE_ENABLE_FINAL ?=
 
 DEB_CMAKE_EXTRA_FLAGS += -DKDE4_BUILD_TESTS=true -DKDE_DISTRIBUTION_TEXT="Debian packages"
 
@@ -22,8 +21,6 @@ ifeq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
     endif
 endif
 
-
-
 ifeq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	#no optimizations, full debug
        DEB_CMAKE_DEBUG_FLAGS = -DCMAKE_BUILD_TYPE=debugfull
@@ -31,9 +28,6 @@ else
 	#This is around -O2 -g
        DEB_CMAKE_DEBUG_FLAGS = -DCMAKE_BUILD_TYPE=relwithdebinfo
 endif
-
-
-
 
 common-build-arch:: debian/stamp-man-pages
 debian/stamp-man-pages:
@@ -64,3 +58,4 @@ binary-install/$(DEB_SOURCE_PACKAGE)-doc-html::
 	for pkg in $(DOC_HTML_PRUNE) ; do \
 		rm -rf debian/$(DEB_SOURCE_PACKAGE)-doc-html/usr/share/doc/kde/HTML/en/$$pkg; \
 	done
+

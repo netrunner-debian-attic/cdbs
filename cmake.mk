@@ -44,17 +44,24 @@ DEB_MAKE_INVOKE = $(DEB_MAKE_ENVVARS) $(MAKE) -C $(DEB_BUILDDIR)
 
 include $(_cdbs_class_path)/makefile.mk$(_cdbs_makefile_suffix)
 
-
 common-configure-arch common-configure-indep:: common-configure-impl
 common-configure-impl:: $(DEB_BUILDDIR)/CMakeCache.txt
 $(DEB_BUILDDIR)/CMakeCache.txt:
 	cd $(DEB_BUILDDIR) && cmake $(CURDIR)/$(DEB_SRCDIR) \
-	-DCMAKE_INSTALL_PREFIX="$(DEB_CMAKE_PREFIX)" $(KDE4-ENABLE-FINAL) \
+	-DCMAKE_INSTALL_PREFIX="$(DEB_CMAKE_PREFIX)" \
 	$(DEB_CMAKE_EXTRA_FLAGS) -DCMAKE_CXX_FLAGS="$(CXXFLAGS)" \
-	-DCMAKE_C_FLAGS="$(CFLAGS)" -DCMAKE_VERBOSE_MAKEFILE=ON $(DEB_CMAKE_DEBUG_FLAGS) \
-	-DCMAKE_SKIP_RPATH=true -DKDE4_BUILD_TESTS=true -DKDE_DISTRIBUTION_TEXT="Debian packages" \
-	-DSYSCONF_INSTALL_DIR=/etc \
-	-DHTML_INSTALL_DIR=/usr/share/doc/kde/HTML
+	-DCMAKE_C_FLAGS="$(CFLAGS)" -DCMAKE_VERBOSE_MAKEFILE=ON \
+	$(DEB_CMAKE_DEBUG_FLAGS) \
+	$(KDE4-ENABLE-FINAL) \
+	-DKDE4_BUILD_TESTS=true \
+	-DKDE_DISTRIBUTION_TEXT="Debian packages" \
+	-DCMAKE_SKIP_RPATH=true \
+	-DCONFIG_INSTALL_DIR=/etc/kde4 \
+	-DDATA_INSTALL_DIR=/usr/share/kde4/apps \
+	-DHTML_INSTALL_DIR=/usr/share/doc/kde4/HTML \
+	-DKCFG_INSTALL_DIR=/usr/share/kde4/config.kcfg \
+	-DLIB_INSTALL_DIR=/usr/lib \
+	-DSYSCONF_INSTALL_DIR=/etc
 	mkdir -p $(DEB_DESTDIR)
 
 cleanbuilddir::
