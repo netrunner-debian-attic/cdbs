@@ -50,23 +50,11 @@ $(DEB_BUILDDIR)/CMakeCache.txt:
 	cd $(DEB_BUILDDIR) && cmake $(CURDIR)/$(DEB_SRCDIR) \
 	-DCMAKE_INSTALL_PREFIX="$(DEB_CMAKE_PREFIX)" \
 	$(DEB_CMAKE_EXTRA_FLAGS) -DCMAKE_CXX_FLAGS="$(CXXFLAGS)" \
-	-DCMAKE_C_FLAGS="$(CFLAGS)" -DCMAKE_VERBOSE_MAKEFILE=ON \
-	$(DEB_CMAKE_DEBUG_FLAGS) \
-	$(KDE4-ENABLE-FINAL) \
-	-DKDE4_BUILD_TESTS=true \
-	-DKDE_DISTRIBUTION_TEXT="Debian packages" \
-	-DCMAKE_SKIP_RPATH=true \
-	-DCONFIG_INSTALL_DIR=/etc/kde4 \
-	-DDATA_INSTALL_DIR=/usr/share/kde4/apps \
-	-DHTML_INSTALL_DIR=/usr/share/doc/kde4/HTML \
-	-DKCFG_INSTALL_DIR=/usr/share/kde4/config.kcfg \
-	-DLIB_INSTALL_DIR=/usr/lib \
-	-DSYSCONF_INSTALL_DIR=/etc
+	-DCMAKE_C_FLAGS="$(CFLAGS)" -DCMAKE_VERBOSE_MAKEFILE=ON
 	mkdir -p $(DEB_DESTDIR)
 
 cleanbuilddir::
 	-if test "$(DEB_BUILDDIR)" != "$(DEB_SRCDIR)"; then rm -rf $(DEB_BUILDDIR); fi
-	rm -f CMakeCache.txt
 
 endif
 

@@ -1,16 +1,30 @@
-export XDG_DATA_DIRS=/usr/share
-export XDG_CONFIG_DIRS=/etc/xdg
-
+# until bug 377524 resolved.
 include debian/cdbs/cmake.mk
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/rules/patchsys-quilt.mk
+# until bug #423394 resolved.
 include debian/cdbs/utils.mk
 
-DEB_DH_INSTALL_ARGS = --sourcedir=debian/tmp
 DEB_COMPRESS_EXCLUDE = .dcl .docbook -license .tag .sty .el
-DEB_KDE_ENABLE_FINAL ?=
+DEB_CMAKE_EXTRA_FLAGS += \
+			$(DEB_CMAKE_DEBUG_FLAGS) \
+			$(KDE4-ENABLE-FINAL) \
+			-DKDE4_BUILD_TESTS=true \
+			-DKDE_DISTRIBUTION_TEXT="Debian packages" \
+			-DCMAKE_SKIP_RPATH=true \
+			-DCONFIG_INSTALL_DIR=/etc/kde4 \
+			-DDATA_INSTALL_DIR=/usr/share/kde4/apps \
+			-DHTML_INSTALL_DIR=/usr/share/doc/kde4/HTML \
+			-DKCFG_INSTALL_DIR=/usr/share/kde4/config.kcfg \
+			-DLIB_INSTALL_DIR=/usr/lib \
+			-DSYSCONF_INSTALL_DIR=/etc
 
-DEB_CMAKE_EXTRA_FLAGS += -DKDE4_BUILD_TESTS=true -DKDE_DISTRIBUTION_TEXT="Debian packages"
+#DEB_CMAKE_PREFIX = /usr/lib/kde4
+DEB_DH_INSTALL_ARGS = --sourcedir=debian/tmp
+#DEB_DH_SHLIBDEPS_ARGS = -l/usr/lib/kde4/lib/
+DEB_KDE_ENABLE_FINAL ?=
+#DEB_MAKE_ENVVARS += XDG_CONFIG_DIRS=/etc/xdg XDG_DATA_DIRS=/usr/share
+#DEB_STRIP_EXCLUDE = so
 
 ifeq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
     cdbs_treat_me_gently_arches := arm m68k alpha ppc64 armel armeb
@@ -45,6 +59,7 @@ clean::
 	rm -rf debian/man/out
 	-rmdir debian/man
 	rm -f debian/stamp-man-pages
+	rm -f CMakeCache.txt
 
 binary-install/$(DEB_SOURCE_PACKAGE)-doc-html::
 	set -e; \
