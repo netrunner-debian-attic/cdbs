@@ -56,6 +56,8 @@ debian/stamp-man-pages:
 	touch debian/stamp-man-pages
 
 clean::
+	#guard against experimental uploads to unstable
+	dpkg-parsechangelog | grep ^Distribution | grep -q experimental
 	rm -rf debian/man/out
 	-rmdir debian/man
 	rm -f debian/stamp-man-pages
