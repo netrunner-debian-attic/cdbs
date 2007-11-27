@@ -65,6 +65,18 @@ endif
 	rm -f debian/stamp-man-pages
 	rm -f CMakeCache.txt
 
+
+$(patsubst %,binary-install/%,$(DEB_PACKAGES)) :: binary-install/%:
+	if test -x /usr/bin/dh_desktop; then dh_desktop -p$(cdbs_curpkg) $(DEB_DH_DESKTOP_ARGS); fi
+	if test -e debian/$(cdbs_curpkg).lintian; then \
+		install -p -D -m644 debian/$(cdbs_curpkg).lintian \
+			debian/$(cdbs_curpkg)/usr/share/lintian/overrides/$(cdbs_curpkg); \
+	fi
+	if test -e debian/$(cdbs_curpkg).presubj; then \
+		install -p -D -m644 debian/$(cdbs_curpkg).presubj \
+			debian/$(cdbs_curpkg)/usr/share/bug/$(cdbs_curpkg)/presubj; \
+	fi
+
 binary-install/$(DEB_SOURCE_PACKAGE)-doc-html::
 	set -e; \
 	for doc in `cd $(DEB_DESTDIR)/usr/share/doc/kde/HTML/en; find . -name index.docbook`; do \
