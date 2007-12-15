@@ -2,8 +2,7 @@
 include debian/cdbs/cmake.mk
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/rules/patchsys-quilt.mk
-# until bug #423394 resolved.
-include debian/cdbs/utils.mk
+include /usr/share/cdbs/1/rules/utils.mk
 
 DEB_COMPRESS_EXCLUDE = .dcl .docbook -license .tag .sty .el
 DEB_CMAKE_EXTRA_FLAGS += \
