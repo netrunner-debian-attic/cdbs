@@ -60,7 +60,7 @@ debian/stamp-man-pages:
 clean::
 ifndef THIS_SHOULD_GO_TO_UNSTABLE
 	#guard against experimental uploads to unstable
-	dpkg-parsechangelog | grep ^Distribution | grep -q experimental
+	dpkg-parsechangelog | grep ^Distribution | grep -q 'experimental\|UNRELEASED'
 endif
 	rm -rf debian/man/out
 	-rmdir debian/man
