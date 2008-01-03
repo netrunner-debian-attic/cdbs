@@ -11,6 +11,7 @@ DEB_CMAKE_EXTRA_FLAGS += \
 			-DKDE4_BUILD_TESTS=true \
 			-DKDE_DISTRIBUTION_TEXT="Debian packages" \
 			-DCMAKE_SKIP_RPATH=true \
+			-DKDE4_USE_ALWAYS_FULL_RPATH=false \
 			-DCONFIG_INSTALL_DIR=/etc/kde4 \
 			-DDATA_INSTALL_DIR=/usr/share/kde4/apps \
 			-DHTML_INSTALL_DIR=/usr/share/doc/kde4/HTML \
