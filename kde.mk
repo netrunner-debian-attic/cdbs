@@ -6,9 +6,9 @@ include /usr/share/cdbs/1/rules/utils.mk
 
 DEB_COMPRESS_EXCLUDE = .dcl .docbook -license .tag .sty .el
 DEB_CMAKE_EXTRA_FLAGS += \
-			$(DEB_CMAKE_DEBUG_FLAGS) \
+			-DCMAKE_BUILD_TYPE=debian \
 			$(KDE4-ENABLE-FINAL) \
-			-DKDE4_BUILD_TESTS=true \
+			-DKDE4_BUILD_TESTS=false \
 			-DKDE_DISTRIBUTION_TEXT="Debian packages" \
 			-DCMAKE_SKIP_RPATH=true \
 			-DKDE4_USE_ALWAYS_FULL_RPATH=false \
@@ -36,14 +36,6 @@ ifeq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
     else
         KDE4-ENABLE-FINAL =
     endif
-endif
-
-ifeq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
-	#no optimizations, full debug
-       DEB_CMAKE_DEBUG_FLAGS = -DCMAKE_BUILD_TYPE=debugfull
-else
-	#This is around -O2 -g
-       DEB_CMAKE_DEBUG_FLAGS = -DCMAKE_BUILD_TYPE=relwithdebinfo
 endif
 
 common-build-arch:: debian/stamp-man-pages
