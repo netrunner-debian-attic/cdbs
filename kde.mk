@@ -6,7 +6,7 @@ include /usr/share/cdbs/1/rules/utils.mk
 
 DEB_COMPRESS_EXCLUDE = .dcl .docbook -license .tag .sty .el
 DEB_CMAKE_EXTRA_FLAGS += \
-			-DCMAKE_BUILD_TYPE=debian \
+			-DCMAKE_BUILD_TYPE=Debian \
 			$(KDE4-ENABLE-FINAL) \
 			-DKDE4_BUILD_TESTS=false \
 			-DKDE_DISTRIBUTION_TEXT="Debian packages" \
