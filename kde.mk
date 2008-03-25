@@ -22,7 +22,7 @@ DEB_CMAKE_EXTRA_FLAGS += \
 			-DCMAKE_EXE_LINKER_FLAGS="-Wl,--no-undefined -Wl,--as-needed"
 
 #DEB_CMAKE_PREFIX = /usr/lib/kde4
-DEB_DH_INSTALL_SOURCEDIR=debian/tmp
+DEB_DH_INSTALL_SOURCEDIR = debian/tmp
 #DEB_DH_SHLIBDEPS_ARGS = -l/usr/lib/kde4/lib/
 DEB_KDE_ENABLE_FINAL ?=
 #DEB_MAKE_ENVVARS += XDG_CONFIG_DIRS=/etc/xdg XDG_DATA_DIRS=/usr/share
