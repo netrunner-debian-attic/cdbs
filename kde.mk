@@ -16,10 +16,24 @@ DEB_CMAKE_EXTRA_FLAGS += \
 			-DHTML_INSTALL_DIR=/usr/share/doc/kde4/HTML \
 			-DKCFG_INSTALL_DIR=/usr/share/kde4/config.kcfg \
 			-DLIB_INSTALL_DIR=/usr/lib \
-			-DSYSCONF_INSTALL_DIR=/etc \
-			-DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined -Wl,--as-needed" \
-			-DCMAKE_MODULE_LINKER_FLAGS="-Wl,--no-undefined -Wl,--as-needed" \
-			-DCMAKE_EXE_LINKER_FLAGS="-Wl,--no-undefined -Wl,--as-needed"
+			-DSYSCONF_INSTALL_DIR=/etc
+
+# Set the one below to something else than 'yes' to disable linking 
+# with --as-needed (on by default)
+DEB_KDE_LINK_WITH_AS_NEEDED ?= yes
+ifneq (,$(findstring yes, $(DEB_KDE_LINK_WITH_AS_NEEDED)))
+	ifeq (,$(findstring no-as-needed, $(DEB_BUILD_OPTIONS)))
+		DEB_KDE_LINK_WITH_AS_NEEDED := yes
+		DEB_CMAKE_EXTRA_FLAGS += \
+					-DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined -Wl,--as-needed" \
+					-DCMAKE_MODULE_LINKER_FLAGS="-Wl,--no-undefined -Wl,--as-needed" \
+					-DCMAKE_EXE_LINKER_FLAGS="-Wl,--no-undefined -Wl,--as-needed"
+	else
+		DEB_KDE_LINK_WITH_AS_NEEDED := no
+	endif
+else
+	DEB_KDE_LINK_WITH_AS_NEEDED := no
+endif
 
 #DEB_CMAKE_PREFIX = /usr/lib/kde4
 DEB_DH_INSTALL_SOURCEDIR = debian/tmp
