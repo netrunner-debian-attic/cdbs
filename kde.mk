@@ -3,6 +3,8 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/rules/patchsys-quilt.mk
 include /usr/share/cdbs/1/rules/utils.mk
 
+DEB_CONFIG_INSTALL_DIR ?= /etc/kde4
+
 DEB_COMPRESS_EXCLUDE = .dcl .docbook -license .tag .sty .el
 DEB_CMAKE_EXTRA_FLAGS += \
 			-DCMAKE_BUILD_TYPE=Debian \
@@ -11,7 +13,7 @@ DEB_CMAKE_EXTRA_FLAGS += \
 			-DKDE_DISTRIBUTION_TEXT="Debian packages" \
 			-DCMAKE_SKIP_RPATH=true \
 			-DKDE4_USE_ALWAYS_FULL_RPATH=false \
-			-DCONFIG_INSTALL_DIR=/etc/kde4 \
+			-DCONFIG_INSTALL_DIR=$(DEB_CONFIG_INSTALL_DIR) \
 			-DDATA_INSTALL_DIR=/usr/share/kde4/apps \
 			-DHTML_INSTALL_DIR=/usr/share/doc/kde4/HTML \
 			-DKCFG_INSTALL_DIR=/usr/share/kde4/config.kcfg \
