@@ -103,6 +103,6 @@ binary-install/$(DEB_SOURCE_PACKAGE)-doc-html::
 
 # Process "sameVersionDep:" substvars
 DH_SAMEVERSIONDEPS=debian/cdbs/dh_sameversiondeps
-$(patsubst %,binary-predeb/%,$(DEB_PACKAGES)) :: binary-predeb/%:
+common-binary-predeb-arch common-binary-predeb-indep::
 	@if [ ! -x "$(DH_SAMEVERSIONDEPS)" ]; then chmod a+x "$(DH_SAMEVERSIONDEPS)"; fi
-	$(DH_SAMEVERSIONDEPS) -p$(cdbs_curpkg)
+	$(DH_SAMEVERSIONDEPS)
