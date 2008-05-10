@@ -73,7 +73,6 @@ endif
 	rm -rf debian/man/out
 	-rmdir debian/man
 	rm -f debian/stamp-man-pages
-	rm -f debian/stamp-sameversiondeps
 	rm -f CMakeCache.txt
 
 
@@ -103,5 +102,7 @@ binary-install/$(DEB_SOURCE_PACKAGE)-doc-html::
 
 
 # Generate "sameVersionDep" substvars
+DH_SAMEVERSIONDEPS=debian/cdbs/sameversiondeps
 $(patsubst %,binary-predeb/%,$(DEB_PACKAGES)) :: binary-predeb/%:
-	debian/cdbs/dh_sameversiondeps -p$(cdbs_curpkg)
+	@if [ ! -x "$(DH_SAMEVERSIONDEPS)" ]; then chmod a+x "$(DH_SAMEVERSIONDEPS)"; fi
+	$(DH_SAMEVERSIONDEPS) -p$(cdbs_curpkg)
