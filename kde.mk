@@ -101,8 +101,8 @@ binary-install/$(DEB_SOURCE_PACKAGE)-doc-html::
 	done
 
 
-# Generate "sameVersionDep" substvars
-DH_SAMEVERSIONDEPS=debian/cdbs/sameversiondeps
+# Process "sameVersionDep:" substvars
+DH_SAMEVERSIONDEPS=debian/cdbs/dh_sameversiondeps
 $(patsubst %,binary-predeb/%,$(DEB_PACKAGES)) :: binary-predeb/%:
 	@if [ ! -x "$(DH_SAMEVERSIONDEPS)" ]; then chmod a+x "$(DH_SAMEVERSIONDEPS)"; fi
 	$(DH_SAMEVERSIONDEPS) -p$(cdbs_curpkg)
