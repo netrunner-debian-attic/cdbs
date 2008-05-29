@@ -114,7 +114,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
             my $fieldval = $pkg->{$fieldname};
             my $pkgname = $pkg->{Package};
 
-            while ($fieldval =~ m/\G.*?$re_oursubstvar/g) {
+            while ($fieldval =~ m/\G.*?$re_oursubstvar/gs) {
                 my $varname = $1;
                 my $dep2add = $2;
                 my $basepkg = $3;
