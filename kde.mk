@@ -3,7 +3,7 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/rules/patchsys-quilt.mk
 include /usr/share/cdbs/1/rules/utils.mk
 
-DEB_CONFIG_INSTALL_DIR ?= /etc/kde4
+DEB_CONFIG_INSTALL_DIR ?= /usr/share/kde4/config
 
 DEB_COMPRESS_EXCLUDE = .dcl .docbook -license .tag .sty .el
 DEB_CMAKE_EXTRA_FLAGS += \
