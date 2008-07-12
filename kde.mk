@@ -3,40 +3,13 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/rules/patchsys-quilt.mk
 include /usr/share/cdbs/1/rules/utils.mk
 
-DEB_CONFIG_INSTALL_DIR ?= /usr/share/kde4/config
+# Include default KDE 4 cmake configuration variables
+include debian/cdbs/variables.mk
+# Pass standard KDE 4 flags to cmake via appropriate CDBS variable
+# (DEB_CMAKE_EXTRA_FLAGS)
+DEB_CMAKE_EXTRA_FLAGS = $(DEB_CMAKE_KDE4_FLAGS) $(DEB_CMAKE_CUSTOM_FLAGS) $(DEB_CMAKE_EXTRA_FLAGS)
 
 DEB_COMPRESS_EXCLUDE = .dcl .docbook -license .tag .sty .el
-DEB_CMAKE_EXTRA_FLAGS += \
-			-DCMAKE_BUILD_TYPE=Debian \
-			$(KDE4-ENABLE-FINAL) \
-			-DKDE4_BUILD_TESTS=false \
-			-DKDE_DISTRIBUTION_TEXT="Debian packages" \
-			-DKDE_DEFAULT_HOME=.kde4 \
-			-DCMAKE_SKIP_RPATH=true \
-			-DKDE4_USE_ALWAYS_FULL_RPATH=false \
-			-DCONFIG_INSTALL_DIR=$(DEB_CONFIG_INSTALL_DIR) \
-			-DDATA_INSTALL_DIR=/usr/share/kde4/apps \
-			-DHTML_INSTALL_DIR=/usr/share/doc/kde4/HTML \
-			-DKCFG_INSTALL_DIR=/usr/share/kde4/config.kcfg \
-			-DLIB_INSTALL_DIR=/usr/lib \
-			-DSYSCONF_INSTALL_DIR=/etc
-
-# Set the one below to something else than 'yes' to disable linking 
-# with --as-needed (on by default)
-DEB_KDE_LINK_WITH_AS_NEEDED ?= yes
-ifneq (,$(findstring yes, $(DEB_KDE_LINK_WITH_AS_NEEDED)))
-	ifeq (,$(findstring no-as-needed, $(DEB_BUILD_OPTIONS)))
-		DEB_KDE_LINK_WITH_AS_NEEDED := yes
-		DEB_CMAKE_EXTRA_FLAGS += \
-					-DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined -Wl,--as-needed" \
-					-DCMAKE_MODULE_LINKER_FLAGS="-Wl,--no-undefined -Wl,--as-needed" \
-					-DCMAKE_EXE_LINKER_FLAGS="-Wl,--no-undefined -Wl,--as-needed"
-	else
-		DEB_KDE_LINK_WITH_AS_NEEDED := no
-	endif
-else
-	DEB_KDE_LINK_WITH_AS_NEEDED := no
-endif
 
 #DEB_CMAKE_PREFIX = /usr/lib/kde4
 DEB_DH_INSTALL_SOURCEDIR = debian/tmp
@@ -44,15 +17,6 @@ DEB_DH_INSTALL_SOURCEDIR = debian/tmp
 DEB_KDE_ENABLE_FINAL ?=
 #DEB_MAKE_ENVVARS += XDG_CONFIG_DIRS=/etc/xdg XDG_DATA_DIRS=/usr/share
 #DEB_STRIP_EXCLUDE = so
-
-ifeq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
-    cdbs_treat_me_gently_arches := arm m68k alpha ppc64 armel armeb
-    ifeq (,$(filter $(DEB_HOST_ARCH_CPU),$(cdbs_treat_me_gently_arches)))
-        KDE4-ENABLE-FINAL = $(if $(DEB_KDE_ENABLE_FINAL),-DKDE4_ENABLE_FINAL=true,)
-    else
-        KDE4-ENABLE-FINAL =
-    endif
-endif
 
 common-build-arch:: debian/stamp-man-pages
 debian/stamp-man-pages:
