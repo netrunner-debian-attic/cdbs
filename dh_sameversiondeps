@@ -180,7 +180,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
                     my $scanpkg = $2;
                     $scanpkg = $dh{MAINPACKAGE} unless defined $scanpkg;
                     my $deptype = $3;
-                    $deptype = $fields[0] unless defined $deptype;
+                    $deptype = $fieldname unless defined $deptype;
 
                     if (!exists $shlibsvars{$scanpkg}) {
                         my $scan_substvars = sprintf("debian/%ssubstvars", pkgext($scanpkg));
