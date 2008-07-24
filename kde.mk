@@ -70,4 +70,4 @@ binary-install/$(DEB_SOURCE_PACKAGE)-doc-html::
 DH_SAMEVERSIONDEPS=debian/cdbs/dh_sameversiondeps
 common-binary-predeb-arch common-binary-predeb-indep::
 	@if [ ! -x "$(DH_SAMEVERSIONDEPS)" ]; then chmod a+x "$(DH_SAMEVERSIONDEPS)"; fi
-	$(DH_SAMEVERSIONDEPS)
+	$(DH_SAMEVERSIONDEPS) $(if $(filter common-binary-predeb-arch,$@),-a,-i)

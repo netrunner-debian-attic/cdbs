@@ -12,11 +12,20 @@ my $namespace = "sameVersionDep";
 my @fields = qw(Depends Recommends Suggests Enhances Pre-Depends);
 my $re_fields = join("|", @fields);
 my $re_pkgname = qr/[a-z0-9][a-z0-9+.-]*/;
-my $re_oursubstvar = qr/\$\{($namespace:($re_pkgname):($re_pkgname)-($re_fields)-($re_pkgname))\}/;
+my $re_oursubstvar = qr/\$\{($namespace:(.*?))\}/;
+my $re_splitsubstvar = qr/^($re_pkgname)(?::($re_pkgname))?(?:-($re_fields))?$/;
 
 # Global substvars file
 my $g_substvars = new Dpkg::Substvars;
 $g_substvars->parse("debian/substvars") if (-r "debian/substvars");
+
+sub extract_package_names {
+    my $val = shift;
+    $val =~ s/\([^)]+\)//g;
+    $val =~ s/^\s+//;
+    $val =~ s/\s+$//;
+    return split(/\s*,\s*/, $val);
+}
 
 sub Shlibsvars::new {
     my ($cls, $package, $control, $substvars_file) = @_;
@@ -63,7 +72,56 @@ sub Shlibsvars::extract_deps {
             push @matched_deps, $dep;
         }
     }
-    return join(",", @matched_deps);
+    return @matched_deps;
+}
+
+sub Shlibsvars::get_dep_package_names {
+    my ($self, $field) = @_;
+
+    my $val = $self->get_fieldval($field);
+    return undef() unless defined $val;
+    return extract_package_names($val);
+}
+
+sub get_package_dpkg_status {
+    my $binpkgs = shift;
+    my $fields = shift;
+    $fields = [ "Source", "Version" ] unless defined $fields;
+    my $regexp_fields = join("|", @$fields);
+    my %status;
+
+    my $pid = open(DPKG, "-|");
+    error("cannot fork for dpkg-query --status") unless defined($pid);
+    if (!$pid) {
+        # Child process running dpkg --search and discarding errors
+        close STDERR;
+        open STDERR, ">", "/dev/null";
+        $ENV{LC_ALL} = "C";
+        exec("dpkg-query", "--status", "--", @$binpkgs) or error("cannot exec dpkg-query");
+    }
+    my $curpkg;
+    while (defined($_ = <DPKG>)) {
+        if (m/^Package:\s*(.*)$/) {
+            $curpkg = $1;
+            $status{$curpkg} = {};
+        } elsif (defined($curpkg)) {
+            if (m/^($regexp_fields):\s*(.*)$/) {
+                my $field = $1;
+                error("Dublicate field $field for the $curpkg package in the dpkg status file")
+                    if (exists $status{$curpkg}{$field});
+                $status{$curpkg}{$field} = $2;
+            }
+        } else {
+            error("Missing Package entry at $.");
+        }
+    }
+    close(DPKG);
+
+    # Check if all packages were processed
+    for my $pkg (@$binpkgs) {
+        error("Package $pkg was not found in the dpkg status") unless exists $status{$pkg};
+    }
+    return \%status;
 }
 
 sub write_substvar($$$$) {
@@ -116,22 +174,81 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
             while ($fieldval =~ m/\G.*?$re_oursubstvar/gs) {
                 my $varname = $1;
-                my $dep2add = $2;
-                my $basepkg = $3;
-                my $deptype = $4;
-                my $deppkg  = $5;
+                my $varparams = $2;
+                if ($varparams =~ m/$re_splitsubstvar/) {
+                    my $dep2add = $1;
+                    my $scanpkg = $2;
+                    $scanpkg = $dh{MAINPACKAGE} unless defined $scanpkg;
+                    my $deptype = $3;
+                    $deptype = $fields[0] unless defined $deptype;
 
-                if (!exists $shlibsvars{$basepkg}) {
-                    my $base_substvars = sprintf("debian/%ssubstvars", pkgext($basepkg));
-                    $shlibsvars{$basepkg} = new Shlibsvars($basepkg, $control, $base_substvars);
+                    if (!exists $shlibsvars{$scanpkg}) {
+                        my $scan_substvars = sprintf("debian/%ssubstvars", pkgext($scanpkg));
+                        $shlibsvars{$scanpkg} = new Shlibsvars($scanpkg, $control, $scan_substvars);
+                    }
+
+                    # Get dpkg status information about dep2add package
+                    my $dep2add_status = get_package_dpkg_status( [ $dep2add ], [ "Source", "Version", $deptype ] );
+                    $dep2add_status = $dep2add_status->{$dep2add};
+
+                    # Check validility of dep2add status
+                    error("Could not retreive source package name for $dep2add package. Is it installed?")
+                        unless exists $dep2add_status->{Source} && exists $dep2add_status->{Version};
+                    error("Package $dep2add has no $deptype field. This configuration is unsupported. ")
+                        unless exists $dep2add_status->{$deptype};
+                    my @dep2add_deps = extract_package_names($dep2add_status->{$deptype});
+
+                    # Get deptype packages of scanpkg
+                    my $vars = $shlibsvars{$scanpkg};
+                    my @scan_deps = $vars->get_dep_package_names($deptype);
+
+                    # Intersect both _deps arrays to find common dependencies
+                    my @commondeps;
+                    {
+                        my %_map;
+                        map { $_map{$_} = 1; } @scan_deps;
+                        map { push @commondeps, $_ if exists $_map{$_} } @dep2add_deps;
+                    }
+
+                    # Get status information about common packages. They need to come from the
+                    # same source package as dep2add package and their versions should match
+                    my $depstatus = get_package_dpkg_status(\@commondeps, [ "Source", "Version" ]);
+                    @commondeps = ();
+                    while (my ($pkg, $status) = each(%$depstatus)) {
+                        push @commondeps, $pkg
+                            if (exists $status->{Source} && exists $status->{Version} &&
+                                ($status->{Source} eq $dep2add_status->{Source}) && 
+                                ($status->{Version} eq $dep2add_status->{Version}));
+                    }
+                    
+                    # Ideally we should have got the list down to one. if not, combine
+                    # version relationships
+                    my @fulldeps;
+                    if (!@commondeps) {
+                        error("$0: no same version dependencies for '$varname' found (at $fieldname of the $package package)");
+                    } else {
+                        for my $deppkg (@commondeps) {
+                            my @deps = $vars->extract_deps($deptype, $deppkg);
+                            map s/\b\Q$deppkg\E\b/$dep2add/g, @deps;
+                            push @fulldeps, @deps;
+                        }
+
+                        # Drop dupes
+                        @fulldeps = sort @fulldeps;
+                        my @uniqdeps;
+                        my $_prevdep;
+                        for my $dep (@fulldeps) {
+                            my $tmp = "$dep";
+                            $tmp =~ s/\s//g;
+                            push @uniqdeps, $dep if (!defined $_prevdep || $_prevdep ne $tmp);
+                            $_prevdep = $tmp;
+                        }
+                        # Write substvar for the package
+                        write_substvar($pkgname, $varname, join(", ", @uniqdeps), $pkg_substvars);
+                    }
+                } else {
+                    error("Invalid '$namespace' substvar syntax: $varparams");
                 }
-                my $vars = $shlibsvars{$basepkg};
-                my $deps = $vars->extract_deps($deptype, $deppkg);
-                $deps = "" unless($deps);
-                $deps =~ s/\b\Q$deppkg\E\b/$dep2add/g;
-
-                # Write substvar for the package
-                write_substvar($pkgname, $varname, $deps, $pkg_substvars);
             }
         }
     }
