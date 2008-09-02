@@ -51,6 +51,14 @@ $(patsubst %,binary-install/%,$(DEB_PACKAGES)) :: binary-install/%:
 		install -p -D -m644 debian/$(cdbs_curpkg).presubj \
 			debian/$(cdbs_curpkg)/usr/share/bug/$(cdbs_curpkg)/presubj; \
 	fi
+	if test -e debian/$(cdbs_curpkg).bugscript; then \
+		install -p -D -m755 debian/$(cdbs_curpkg).bugscript \
+			debian/$(cdbs_curpkg)/usr/share/bug/$(cdbs_curpkg)/script; \
+	fi
+	if test -e debian/$(cdbs_curpkg).bugcontrol; then \
+		install -p -D -m644 debian/$(cdbs_curpkg).bugcontrol \
+			debian/$(cdbs_curpkg)/usr/share/bug/$(cdbs_curpkg)/control; \
+	fi
 
 binary-install/$(DEB_SOURCE_PACKAGE)-doc-html::
 	set -e; \
