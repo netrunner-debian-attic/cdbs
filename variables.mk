@@ -15,7 +15,8 @@ DEB_CMAKE_KDE4_FLAGS += \
         -DHTML_INSTALL_DIR=/usr/share/doc/kde4/HTML \
         -DKCFG_INSTALL_DIR=/usr/share/kde4/config.kcfg \
         -DLIB_INSTALL_DIR=/usr/lib \
-        -DSYSCONF_INSTALL_DIR=/etc
+        -DSYSCONF_INSTALL_DIR=/etc \
+        -DKDE4_USE_COMMON_CMAKE_PACKAGE_CONFIG_DIR:BOOL=TRUE
 
 # Support building with enable final (disabled by default)
 DEB_KDE_ENABLE_FINAL ?=
